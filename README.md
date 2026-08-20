@@ -827,9 +827,9 @@ Property-Price-Prediction/
 
 ## 🔗 Project Links
 
-- 🌐 **Live Application:** `<add your deployed URL here>`
+- 🌐 **Live Application:** `https://property-price-prediction-cjz4.onrender.com`
 - 💼 **LinkedIn:** `https://www.linkedin.com/in/aisha-begum-87625527/`
-- 🐙 **GitHub:** `<add your GitHub profile URL here>`
+- 🐙 **GitHub:** `https://github.com/aishab06`
 
 ---
 
