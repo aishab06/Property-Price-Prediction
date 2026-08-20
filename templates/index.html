@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>House Price Prediction | MLR Model</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            color: #222;
+
+            background:
+                radial-gradient(circle at 10% 10%,
+                    rgba(13, 110, 253, 0.16),
+                    transparent 25%),
+
+                radial-gradient(circle at 90% 90%,
+                    rgba(0, 90, 200, 0.14),
+                    transparent 28%),
+
+                linear-gradient(135deg,
+                    #f2f8ff,
+                    #ffffff,
+                    #eaf4ff);
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        /* =====================================================
+           BACKGROUND DECORATION
+        ===================================================== */
+
+        .circle {
+            position: fixed;
+            border-radius: 50%;
+            z-index: -1;
+            filter: blur(2px);
+        }
+
+        .circle-one {
+            width: 280px;
+            height: 280px;
+            background: rgba(13, 110, 253, 0.08);
+            top: -100px;
+            left: -100px;
+        }
+
+        .circle-two {
+            width: 350px;
+            height: 350px;
+            background: rgba(0, 74, 153, 0.07);
+            bottom: -150px;
+            right: -120px;
+        }
+
+        /* =====================================================
+           MAIN CARD
+        ===================================================== */
+
+        .main-card {
+            width: 100%;
+            max-width: 980px;
+
+            background: rgba(255, 255, 255, 0.94);
+
+            border-radius: 28px;
+
+            padding: 45px;
+
+            box-shadow:
+                0 30px 80px rgba(0, 40, 100, 0.15),
+                0 10px 30px rgba(0, 0, 0, 0.06);
+
+            border: 1px solid rgba(13, 110, 253, 0.14);
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Top gradient line */
+
+        .main-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 7px;
+
+            background: linear-gradient(
+                90deg,
+                #003f88,
+                #0d6efd,
+                #3fa9ff,
+                #003f88
+            );
+        }
+
+        /* =====================================================
+           HEADER
+        ===================================================== */
+
+        .brand {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .brand h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: 44px;
+            letter-spacing: 2px;
+            color: #0b4fa0;
+            text-transform: uppercase;
+        }
+
+        .brand h1 span {
+            color: #0d6efd;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 15px;
+            color: #777;
+            margin-bottom: 35px;
+            font-weight: 500;
+        }
+
+        /* =====================================================
+           PROJECT BADGE
+        ===================================================== */
+
+        .badge {
+            width: fit-content;
+            margin: 0 auto 18px;
+
+            padding: 8px 18px;
+
+            border-radius: 50px;
+
+            background: #e8f2ff;
+            color: #0b4fa0;
+
+            font-size: 12px;
+            font-weight: 700;
+
+            letter-spacing: 1px;
+            text-transform: uppercase;
+
+            border: 1px solid rgba(13, 110, 253, 0.18);
+        }
+
+        /* =====================================================
+           FORM SECTION
+        ===================================================== */
+
+        .form-box {
+            background: #fff;
+
+            border-radius: 20px;
+
+            padding: 30px;
+
+            border: 1px solid #eeeeee;
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .form-title {
+            font-size: 21px;
+            font-weight: 700;
+            color: #222;
+
+            margin-bottom: 22px;
+        }
+
+        .form-title span {
+            color: #0d6efd;
+        }
+
+        /* =====================================================
+           FORM GRID
+        ===================================================== */
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 24px;
+        }
+
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* =====================================================
+           FORM ELEMENTS
+        ===================================================== */
+
+        .input-group {
+            margin-bottom: 4px;
+        }
+
+        .input-group label {
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            font-weight: 600;
+
+            color: #333;
+        }
+
+        .input-group label .required {
+            color: #0d6efd;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+
+            left: 16px;
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            font-size: 18px;
+            color: #0d6efd;
+            pointer-events: none;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+
+            padding: 15px 18px 15px 48px;
+
+            border: 2px solid #eeeeee;
+
+            border-radius: 12px;
+
+            background: #fafafa;
+
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+
+            color: #222;
+
+            outline: none;
+
+            transition: 0.3s ease;
+
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        select {
+            cursor: pointer;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d6efd' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 18px;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            background-color: #fff;
+
+            border-color: #0d6efd;
+
+            box-shadow:
+                0 0 0 4px rgba(13, 110, 253, 0.08);
+
+            transform: translateY(-1px);
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 6px;
+        }
+
+        /* =====================================================
+           PREDICT BUTTON
+        ===================================================== */
+
+        .predict-btn {
+            width: 100%;
+
+            margin-top: 10px;
+
+            padding: 16px 25px;
+
+            border: none;
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #003f88,
+                    #0d6efd,
+                    #3fa9ff
+                );
+
+            color: #fff;
+
+            font-family: 'Poppins', sans-serif;
+
+            font-size: 16px;
+            font-weight: 700;
+
+            letter-spacing: 0.5px;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 12px 25px rgba(13, 110, 253, 0.25);
+
+            transition: all 0.3s ease;
+        }
+
+        .predict-btn:hover {
+            transform: translateY(-3px);
+
+            box-shadow:
+                0 18px 35px rgba(13, 110, 253, 0.32);
+        }
+
+        .predict-btn:active {
+            transform: translateY(0);
+        }
+
+        /* =====================================================
+           PREDICTION RESULT
+        ===================================================== */
+
+        .prediction {
+            margin-top: 28px;
+
+            padding: 22px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #003f88,
+                    #0d6efd,
+                    #3fa9ff
+                );
+
+            color: white;
+
+            text-align: center;
+
+            box-shadow:
+                0 15px 30px rgba(13, 110, 253, 0.22);
+
+            animation: resultAppear 0.6s ease;
+        }
+
+        .prediction-label {
+            font-size: 12px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+
+            opacity: 0.85;
+
+            margin-bottom: 5px;
+        }
+
+        .prediction-value {
+            font-size: 28px;
+
+            font-weight: 800;
+        }
+
+        /* =====================================================
+           PROJECT INFORMATION
+        ===================================================== */
+
+        .project-info {
+            text-align: center;
+
+            margin-top: 35px;
+
+            padding-top: 25px;
+
+            border-top: 1px solid #eeeeee;
+        }
+
+        .project-info h2 {
+            font-family: 'Anton', sans-serif;
+
+            font-size: 26px;
+
+            letter-spacing: 1px;
+
+            color: #0b4fa0;
+
+            margin-bottom: 5px;
+        }
+
+        .project-info p {
+            color: #777;
+
+            font-size: 14px;
+
+            font-weight: 500;
+        }
+
+        .project-info .highlight {
+            color: #0d6efd;
+        }
+
+        /* =====================================================
+           STATS ROW
+        ===================================================== */
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .stat-tile {
+            background: #f4f8fd;
+            border: 1px solid #eaf1fb;
+            border-radius: 14px;
+            padding: 16px 10px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0b4fa0;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =====================================================
+           FOOTER
+        ===================================================== */
+
+        .footer {
+            text-align: center;
+
+            margin-top: 25px;
+
+            font-size: 12px;
+
+            color: #999;
+        }
+
+        .footer strong {
+            color: #0b4fa0;
+        }
+
+        /* =====================================================
+           ANIMATION
+        ===================================================== */
+
+        @keyframes resultAppear {
+
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =====================================================
+           MOBILE
+        ===================================================== */
+
+        @media (max-width: 768px) {
+
+            body {
+                padding: 20px 15px;
+            }
+
+            .main-card {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+
+            .brand h1 {
+                font-size: 34px;
+            }
+
+            .tagline {
+                font-size: 13px;
+            }
+
+            .form-box {
+                padding: 22px 18px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .prediction-value {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .main-card {
+                padding: 25px 15px;
+            }
+
+            .brand h1 {
+                font-size: 30px;
+            }
+
+            .form-title {
+                font-size: 18px;
+            }
+
+            input[type="number"],
+            input[type="text"],
+            select {
+                padding: 14px 14px 14px 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background decoration -->
+    <div class="circle circle-one"></div>
+    <div class="circle circle-two"></div>
+
+
+    <!-- Main Application -->
+    <div class="main-card">
+
+        <!-- Brand -->
+        <div class="brand">
+            <h1>House <span>Price Prediction</span></h1>
+        </div>
+
+        <div class="tagline">
+            Enter the house details to generate a machine learning prediction.
+        </div>
+
+
+        <!-- Project Badge -->
+        <div class="badge">
+            Multiple Linear Regression Project
+        </div>
+
+
+        <!-- Form -->
+        <div class="form-box">
+
+            <div class="form-title">
+                🏡 House Price <span>Prediction System</span>
+            </div>
+
+            <!-- =================================================
+                 IMPORTANT:
+                 Keep the input "name" attributes exactly as below —
+                 they must match the feature names your Flask route
+                 passes into custom_input_predict_price() /
+                 saved_model_predict_price(). The "city" field needs
+                 special handling on the backend: convert the chosen
+                 city into the matching one-hot column, e.g.
+                 city_Redmond=True, and update the <option> list to
+                 match every city that actually appears in your
+                 training data (after drop_first=True encoding).
+            ================================================== -->
+
+            <form action="/predict" method="post">
+
+                <div class="form-grid">
+
+                    <div class="input-group">
+                        <label for="bedrooms">Bedrooms <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🛏️</span>
+                            <input type="number" id="bedrooms" name="bedrooms"
+                                placeholder="e.g. 3" step="1" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="bathrooms">Bathrooms <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🛁</span>
+                            <input type="number" id="bathrooms" name="bathrooms"
+                                placeholder="e.g. 2" step="0.25" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="sqft_living">Sqft Living <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📐</span>
+                            <input type="number" id="sqft_living" name="sqft_living"
+                                placeholder="e.g. 1800" step="1" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="sqft_lot">Sqft Lot <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🗺️</span>
+                            <input type="number" id="sqft_lot" name="sqft_lot"
+                                placeholder="e.g. 5000" step="1" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="floors">Floors <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🏢</span>
+                            <input type="number" id="floors" name="floors"
+                                placeholder="e.g. 1" step="0.5" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="waterfront">Waterfront <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🌊</span>
+                            <select id="waterfront" name="waterfront" required>
+                                <option value="" disabled selected>Select option</option>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="view">View (0-4) <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">👁️</span>
+                            <input type="number" id="view" name="view"
+                                placeholder="e.g. 0" step="1" min="0" max="4" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="condition">Condition (1-5) <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">⭐</span>
+                            <input type="number" id="condition" name="condition"
+                                placeholder="e.g. 3" step="1" min="1" max="5" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="sqft_basement">Sqft Basement <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">🧱</span>
+                            <input type="number" id="sqft_basement" name="sqft_basement"
+                                placeholder="e.g. 0" step="1" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="yr_built">Year Built <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📅</span>
+                            <input type="number" id="yr_built" name="yr_built"
+                                placeholder="e.g. 1995" step="1" min="1800" max="2026" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group full-width">
+                        <label for="city">City <span class="required">*</span></label>
+                        <div class="input-wrapper">
+                            <span class="input-icon">📍</span>
+                            <!-- Update these options to match the exact cities
+                                 present in your training data. -->
+                            <select id="city" name="city" required>
+                                <option value="" disabled selected>Select city</option>
+                                <option value="Seattle">Seattle</option>
+                                <option value="Redmond">Redmond</option>
+                                <option value="Bellevue">Bellevue</option>
+                                <option value="Kirkland">Kirkland</option>
+                                <option value="Renton">Renton</option>
+                                <option value="Kent">Kent</option>
+                                <option value="Auburn">Auburn</option>
+                                <option value="Sammamish">Sammamish</option>
+                                <option value="Federal Way">Federal Way</option>
+                                <option value="Issaquah">Issaquah</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="help-text">
+                            Selected city is converted to the matching one-hot column (e.g. city_Redmond) on the server.
+                        </div>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="predict-btn">
+                    🚀 Predict House Price
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =====================================================
+             PREDICTION RESULT
+        ====================================================== -->
+
+        {% if prediction_text %}
+
+        <div class="prediction">
+
+            <div class="prediction-label">
+                Predicted House Price
+            </div>
+
+            <div class="prediction-value">
+                $ {{ prediction_text }}
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+        <!-- =====================================================
+             PROJECT INFORMATION
+        ====================================================== -->
+
+        <div class="project-info">
+
+            <div class="stats-row">
+
+                <div class="stat-tile">
+                    <div class="stat-value">11 Inputs</div>
+                    <div class="stat-label">House Features</div>
+                </div>
+
+                <div class="stat-tile">
+                    <div class="stat-value">ML Model</div>
+                    <div class="stat-label">Multiple Linear Regression</div>
+                </div>
+
+                <div class="stat-tile">
+                    <div class="stat-value">Flask</div>
+                    <div class="stat-label">Python Framework</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Footer -->
+
+        <div class="footer">
+            © 2026 <strong>House Price Predictor</strong> • Machine Learning Project
+        </div>
+
+    </div>
+
+
+    <!-- Optional Bootstrap JS — not required for this design -->
+    <script>
+        // Smooth page initialization
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const form = document.querySelector("form");
+
+            if (form) {
+                form.addEventListener("submit", function () {
+
+                    const button = form.querySelector("button");
+
+                    if (button) {
+                        button.innerHTML = "⏳ Predicting...";
+                    }
+
+                });
+            }
+
+        });
+    </script>
+
+</body>
+
+</html>
