@@ -828,7 +828,7 @@ Property-Price-Prediction/
 ## 🔗 Project Links
 
 - 🌐 **Live Application:** `<add your deployed URL here>`
-- 💼 **LinkedIn:** `<add your LinkedIn URL here>`
+- 💼 **LinkedIn:** `https://www.linkedin.com/in/aisha-begum-87625527/`
 - 🐙 **GitHub:** `<add your GitHub profile URL here>`
 
 ---
